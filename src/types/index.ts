@@ -66,6 +66,6 @@ export interface Persona {
 
    export interface Crypto{
     coin: string;
-    wallter: string;
+    wallet: string;
     network: string;
    }
