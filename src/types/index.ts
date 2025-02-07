@@ -1,32 +1,32 @@
-export interface Persona {
+export interface User {
   id: number;
   firstName: string;
   lastName: string;
-  maidenName: string;
-  age: number;
-  gender: string;
+  maidenName?: string;
+  age?: number;
+  gender?: string;
   email: string;
   phone: number;
-  username: string;
-  password: string;
-  birthDate: number;
-  image: string;
-  bloodGroup: string;
-  heigth: number;
-  weigth: number;
-  eyeColor: string;
-  hair: Hair;
-  ip: string;
-  address: Address;
-  macAddress: string;
-  university: string;
-  bank: Bank;
-  company: Company;
-  ein: string;
-  ssn: string;
-  userAgent: string;
-  crypto: Crypto;
-  role: string;
+  username?: string;
+  password?: string;
+  birthDate?: number;
+  image?: string;
+  bloodGroup?: string;
+  heigth?: number;
+  weigth?: number;
+  eyeColor?: string;
+  hair?: Hair;
+  ip?: string;
+  address?: Address;
+  macAddress?: string;
+  university?: string;
+  bank?: Bank;
+  company?: Company;
+  ein?: string;
+  ssn?: string;
+  userAgent?: string;
+  crypto?: Crypto;
+  role?: string;
 }
 
 export interface Hair {
