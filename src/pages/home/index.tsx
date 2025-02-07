@@ -1,39 +1,27 @@
 import { useEffect, useState } from "react";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
-import { Contenedor } from "./home";
+import { Contenedor } from "./styled";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { User } from "../../types";
+import { listUsers } from "./../../servicios/users";
 
 export function Home() {
   const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
   const paginatorRight = <Button type="button" icon="pi pi-download" text />;
 
-  const [value3, setValue3] = useState("18");
+  const [valueAge, setValueAge] = useState("18");
   const [value, setValue] = useState("");
   const [customers, setCustomers] = useState<User[]>([]);
 
   const [gender, setGender] = useState(null);
   const genero = ["Female", "Male"];
 
-  const apiPersona = async () => {
-    try {
-      const response = await fetch("https://dummyjson.com/users");
-      const responseJson: { users: User[] } = await response.json();
-
-      console.log("Esta todo ok");
-
-      setCustomers(responseJson.users);
-    } catch (error) {
-      console.log("Error al obtenedor datos", error);
-    }
-  };
-
   useEffect(() => {
-    apiPersona();
+    listUsers().then((users)=> setCustomers(users || []));
   }, []);
 
   return (
@@ -44,8 +32,8 @@ export function Home() {
       <Contenedor>
         <InputNumber
           inputId="minmax-buttons"
-          value={value3}
-          onValueChange={(e) => setValue3(e.value)}
+          value={valueAge}
+          onValueChange={(e) => setValueAge(e.value)}
           mode="decimal"
           showButtons
           min={0}
@@ -87,7 +75,7 @@ export function Home() {
         </div>
         <div className="card flex justify-content-center">
           <InputText
-          placeholder="email"
+            placeholder="email"
             variant="filled"
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -95,7 +83,7 @@ export function Home() {
         </div>
         <div className="card flex justify-content-center">
           <InputText
-          placeholder="phone"
+            placeholder="phone"
             variant="filled"
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -103,7 +91,7 @@ export function Home() {
         </div>
         <div className="card flex justify-content-center">
           <InputText
-          placeholder="birthDate"
+            placeholder="birthDate"
             variant="filled"
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -111,7 +99,7 @@ export function Home() {
         </div>
         <div className="card flex justify-content-center">
           <InputText
-          placeholder="userName"
+            placeholder="userName"
             variant="filled"
             value={value}
             onChange={(e) => setValue(e.target.value)}
@@ -119,7 +107,7 @@ export function Home() {
         </div>
         <div className="card flex justify-content-center">
           <InputText
-          placeholder="password"
+            placeholder="password"
             variant="filled"
             value={value}
             onChange={(e) => setValue(e.target.value)}
