@@ -6,10 +6,10 @@ export interface User {
   age?: number;
   gender?: string;
   email: string;
-  phone: number;
+  phone: string;
   username?: string;
   password?: string;
-  birthDate?: string | number;
+  birthDate?: Date | Date[];
   image?: string;
   bloodGroup?: string;
   heigth?: number;

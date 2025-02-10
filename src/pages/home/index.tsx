@@ -9,6 +9,7 @@ import { Dropdown } from "primereact/dropdown";
 import { User } from "../../types";
 import { listUsers } from "./../../servicios/users";
 import { addUser } from "./../../servicios/users";
+import { Calendar } from "primereact/calendar";
 
 export function Home() {
   const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
@@ -17,40 +18,40 @@ export function Home() {
 
   const [customers, setCustomers] = useState<User[]>([]);
   const [valueAge, setValueAge] = useState(18);
-  const [valueGender, setGender] = useState("genero");
+  const [valueGender, setGender] = useState("");
   const [valueFirstName, setValueFirstName] = useState("");
   const [valueLastName, setValueLastName] = useState("");
   const [valueMaidenName, setValueMaidenName] = useState("");
   const [valueEmail, setValueEmail] = useState("");
-  const [valuePhone, setValuePhone] = useState(); 
-  const [valueBirthDate, setValueBirthDate] = useState("");
+  const [valuePhone, setValuePhone] = useState("");
+  const [valueDate, setDate] = useState<Date | undefined>(undefined);
   const [valueUserName, setValueUserName] = useState("");
   const [valuePassword, setValuePassword] = useState("");
 
   const handleSubmit = async () => {
-    const userRegistrarion = {
+    const userRegistrarion: User = {
       age: valueAge,
       gender: valueGender,
       firstName: valueFirstName,
       lastName: valueLastName,
       maidenName: valueMaidenName,
       email: valueEmail,
-      phone: valuePhone || 0,
-      birthDate: valueBirthDate,
-      userName: valueUserName,
+      phone: valuePhone || "",
+      birthDate: valueDate,
+      username: valueUserName,
       password: valuePassword,
     };
 
-    const newUser = await addUser(userRegistrarion);
+    const newUser = await addUser(userRegistrarion); //esperando el nuevo usuario agregado a la lista
     if (newUser) {
+      //si hay nuevo usuario es true, si me devuelve undefined es false
       console.log("Usuario agregago", newUser);
-      customers.push(newUser); //agrego nuevo usuario a la lista de usuario
-      return;
+      //setCustomers([newUser, ...customers]) //agrego nuevo usuario a la lista de usuario
+      listUsers().then((users) => setCustomers(users || []));
     }
   };
 
   useEffect(() => {
-
     listUsers().then((users) => setCustomers(users || []));
   }, []);
 
@@ -74,8 +75,8 @@ export function Home() {
           value={valueGender}
           onChange={(e) => setGender(e.value)}
           options={genero}
-          optionLabel="genero"
-          placeholder="genero"
+          optionLabel="Genero"
+          placeholder="Genero"
           className="w-full md:w-14rem"
         />
 
@@ -114,22 +115,20 @@ export function Home() {
 
         <div className="flex-auto">
           <label htmlFor="withoutgrouping" className="font-bold block mb-2" />
-          <InputNumber
+          <InputText
             placeholder="phone"
             variant="filled"
-            inputId="withoutgrouping"
             value={valuePhone}
-            onValueChange={(e) => setValuePhone(e.value)} // me marca error el value
-            useGrouping={false}
+            onChange={(e) => setValuePhone(e.target.value)}
           />
         </div>
-        
+
         <div className="card flex justify-content-center">
-          <InputText
+          <Calendar
             placeholder="birthDate"
-            variant="filled"
-            value={valueBirthDate}
-            onChange={(e) => setValueBirthDate(e.target.value)}
+            value={valueDate}
+            onChange={(e) => setDate(e.value || undefined)}
+            dateFormat="dd/mm/yy"
           />
         </div>
 
@@ -141,7 +140,6 @@ export function Home() {
             onChange={(e) => setValueUserName(e.target.value)}
           />
         </div>
-
 
         <div className="card flex justify-content-center">
           <InputText

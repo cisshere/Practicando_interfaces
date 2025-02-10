@@ -13,7 +13,8 @@ export const listUsers = async () => {
   }
 };
 
-export const addUser = async (userDatos : User) => {
+export const addUser = async (userDatos: User): Promise<User | undefined> => {  //Especificar que la promesa devuelve un usuario o undefined 
+  // y que userDatos es de tipo User
   try {
     const response = await fetch("https://dummyjson.com/users/add", {
       method: "POST",
