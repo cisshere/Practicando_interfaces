@@ -13,3 +13,17 @@ export const listUsers = async () => {
   }
 };
 
+export const addUser = async (userDatos : User) => {
+  try {
+    const response = await fetch("https://dummyjson.com/users/add", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userDatos),
+    });
+
+    const newUser = await response.json();
+    return newUser;
+  } catch (error) {
+    console.error("No se obtudo datos", error);
+  }
+};

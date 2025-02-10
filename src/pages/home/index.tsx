@@ -8,20 +8,50 @@ import { Button } from "primereact/button";
 import { Dropdown } from "primereact/dropdown";
 import { User } from "../../types";
 import { listUsers } from "./../../servicios/users";
+import { addUser } from "./../../servicios/users";
 
 export function Home() {
   const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
   const paginatorRight = <Button type="button" icon="pi pi-download" text />;
-
-  const [valueAge, setValueAge] = useState("18");
-  const [value, setValue] = useState("");
-  const [customers, setCustomers] = useState<User[]>([]);
-
-  const [gender, setGender] = useState(null);
   const genero = ["Female", "Male"];
 
+  const [customers, setCustomers] = useState<User[]>([]);
+  const [valueAge, setValueAge] = useState(18);
+  const [valueGender, setGender] = useState("genero");
+  const [valueFirstName, setValueFirstName] = useState("");
+  const [valueLastName, setValueLastName] = useState("");
+  const [valueMaidenName, setValueMaidenName] = useState("");
+  const [valueEmail, setValueEmail] = useState("");
+  const [valuePhone, setValuePhone] = useState(); 
+  const [valueBirthDate, setValueBirthDate] = useState("");
+  const [valueUserName, setValueUserName] = useState("");
+  const [valuePassword, setValuePassword] = useState("");
+
+  const handleSubmit = async () => {
+    const userRegistrarion = {
+      age: valueAge,
+      gender: valueGender,
+      firstName: valueFirstName,
+      lastName: valueLastName,
+      maidenName: valueMaidenName,
+      email: valueEmail,
+      phone: valuePhone || 0,
+      birthDate: valueBirthDate,
+      userName: valueUserName,
+      password: valuePassword,
+    };
+
+    const newUser = await addUser(userRegistrarion);
+    if (newUser) {
+      console.log("Usuario agregago", newUser);
+      customers.push(newUser); //agrego nuevo usuario a la lista de usuario
+      return;
+    }
+  };
+
   useEffect(() => {
-    listUsers().then((users)=> setCustomers(users || []));
+
+    listUsers().then((users) => setCustomers(users || []));
   }, []);
 
   return (
@@ -33,7 +63,7 @@ export function Home() {
         <InputNumber
           inputId="minmax-buttons"
           value={valueAge}
-          onValueChange={(e) => setValueAge(e.value)}
+          onValueChange={(e) => setValueAge(e.value || 0)}
           mode="decimal"
           showButtons
           min={0}
@@ -41,79 +71,90 @@ export function Home() {
         />
 
         <Dropdown
-          value={gender}
+          value={valueGender}
           onChange={(e) => setGender(e.value)}
           options={genero}
-          optionLabel="name"
+          optionLabel="genero"
           placeholder="genero"
           className="w-full md:w-14rem"
         />
 
         <div className="card flex justify-content-center">
           <InputText
-            placeholder="Usenarme"
+            placeholder="FirstName"
             variant="filled"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            value={valueFirstName}
+            onChange={(e) => setValueFirstName(e.target.value)}
           />
         </div>
         <div className="card flex justify-content-center">
           <InputText
-            placeholder="FirstName"
+            placeholder="LastName"
             variant="filled"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            value={valueLastName}
+            onChange={(e) => setValueLastName(e.target.value)}
           />
         </div>
         <div className="card flex justify-content-center">
           <InputText
             placeholder="maidenName"
             variant="filled"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            value={valueMaidenName}
+            onChange={(e) => setValueMaidenName(e.target.value)}
           />
         </div>
         <div className="card flex justify-content-center">
           <InputText
             placeholder="email"
             variant="filled"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            value={valueEmail}
+            onChange={(e) => setValueEmail(e.target.value)}
           />
         </div>
-        <div className="card flex justify-content-center">
-          <InputText
+
+        <div className="flex-auto">
+          <label htmlFor="withoutgrouping" className="font-bold block mb-2" />
+          <InputNumber
             placeholder="phone"
             variant="filled"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            inputId="withoutgrouping"
+            value={valuePhone}
+            onValueChange={(e) => setValuePhone(e.value)} // me marca error el value
+            useGrouping={false}
           />
         </div>
+        
         <div className="card flex justify-content-center">
           <InputText
             placeholder="birthDate"
             variant="filled"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            value={valueBirthDate}
+            onChange={(e) => setValueBirthDate(e.target.value)}
           />
         </div>
+
         <div className="card flex justify-content-center">
           <InputText
-            placeholder="userName"
+            placeholder="Usenarme"
             variant="filled"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            value={valueUserName}
+            onChange={(e) => setValueUserName(e.target.value)}
           />
         </div>
+
+
         <div className="card flex justify-content-center">
           <InputText
             placeholder="password"
             variant="filled"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
+            value={valuePassword}
+            onChange={(e) => setValuePassword(e.target.value)}
           />
         </div>
       </Contenedor>
+      <div className="card flex justify-content-center">
+        <Button label="Submit" onClick={handleSubmit} />
+      </div>
       <DataTable
         value={customers}
         paginator

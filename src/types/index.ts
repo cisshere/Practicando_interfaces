@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  id?: number;
   firstName: string;
   lastName: string;
   maidenName?: string;
@@ -9,7 +9,7 @@ export interface User {
   phone: number;
   username?: string;
   password?: string;
-  birthDate?: number;
+  birthDate?: string | number;
   image?: string;
   bloodGroup?: string;
   heigth?: number;
