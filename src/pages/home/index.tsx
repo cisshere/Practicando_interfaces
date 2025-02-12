@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { Contenedor } from "./styled";
@@ -10,8 +10,27 @@ import { User } from "../../types";
 import { listUsers } from "./../../servicios/users";
 import { addUser } from "./../../servicios/users";
 import { Calendar } from "primereact/calendar";
+import { PrimeIcons } from "primereact/api";
+import "primeicons/primeicons.css";
+import { Toast } from "primereact/toast";
 
 export function Home() {
+  const toast = useRef<Toast>(null);
+
+  const cuentaBancaria = (user: User) => {
+    if (user.bank) {
+      const { cardExpire, cardNumber, cardType, currency, iban } = user.bank;
+      toast.current?.show({
+        severity: "info",
+        summary: "Datos de la Cuenta Bancaria",
+        detail: `Card Expire: ${cardExpire}, Card Number: ${cardNumber},
+         Card Type: ${cardType}, Currency: ${currency}, IBAN: ${iban}`,
+      });
+    } else {
+      console.log("El usuario no tiene datos bancarios")
+    }
+  }; 
+
   const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
   const paginatorRight = <Button type="button" icon="pi pi-download" text />;
   const genero = ["Female", "Male"];
@@ -24,7 +43,7 @@ export function Home() {
   const [valueMaidenName, setValueMaidenName] = useState("");
   const [valueEmail, setValueEmail] = useState("");
   const [valuePhone, setValuePhone] = useState("");
-  const [valueDate, setDate] = useState<Date | undefined>(undefined);
+  const [valueDate, setDate] = useState<Date | undefined>(undefined); // para qu
   const [valueUserName, setValueUserName] = useState("");
   const [valuePassword, setValuePassword] = useState("");
 
@@ -46,8 +65,8 @@ export function Home() {
     if (newUser) {
       //si hay nuevo usuario es true, si me devuelve undefined es false
       console.log("Usuario agregago", newUser);
-      //setCustomers([newUser, ...customers]) //agrego nuevo usuario a la lista de usuario
-      listUsers().then((users) => setCustomers(users || []));
+      // setCustomers([newUser, ...customers]) //agrego nuevo usuario a la lista de usuario
+      // listUsers().then((users) => setCustomers(users || []));
     }
   };
 
@@ -151,7 +170,7 @@ export function Home() {
         </div>
       </Contenedor>
       <div className="card flex justify-content-center">
-        <Button label="Submit" onClick={handleSubmit} />
+        <Button label="Guardar" onClick={handleSubmit} />
       </div>
       <DataTable
         value={customers}
@@ -164,19 +183,27 @@ export function Home() {
         paginatorLeft={paginatorLeft}
         paginatorRight={paginatorRight}
       >
-        <Column field="id" header="Id" style={{ width: "20%" }}></Column>
+        <Column field="id" header="Id" style={{ width: "10%" }} />
+        <Column field="firstName" header="firstName" style={{ width: "20%" }} />
+        <Column field="lastName" header="lastName" style={{ width: "20%" }} />
+        <Column field="email" header="Email" style={{ width: "20%" }} />
+        <Column field="phone" header="phone" style={{ width: "20%" }} />
         <Column
-          field="firstName"
-          header="firstName"
-          style={{ width: "20%" }}
-        ></Column>
-        <Column
-          field="lastName"
-          header="lastName"
-          style={{ width: "20%" }}
-        ></Column>
-        <Column field="email" header="Email" style={{ width: "20%" }}></Column>
-        <Column field="phone" header="phone" style={{ width: "20%" }}></Column>
+          field="actions"
+          header="actions"
+          style={{ width: "10%" }}
+          body={(user) => (
+            <>
+              <div className="card flex justify-content-center">
+                <Toast ref={toast} />
+                <Button
+                  icon={PrimeIcons.BUILDING}
+                  onClick={() => cuentaBancaria(user)}
+                />
+              </div>
+            </>
+          )}
+        />
       </DataTable>
     </>
   );

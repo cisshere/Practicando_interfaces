@@ -1,5 +1,6 @@
 import { User } from "../types/index";
 
+
 export const listUsers = async () => {
   try {
     const response = await fetch("https://dummyjson.com/users");
@@ -13,7 +14,8 @@ export const listUsers = async () => {
   }
 };
 
-export const addUser = async (userDatos: User): Promise<User | undefined> => {  //Especificar que la promesa devuelve un usuario o undefined 
+export const addUser = async (userDatos: User): Promise<User | undefined> => {
+  //Especificar que la promesa devuelve un usuario o undefined
   // y que userDatos es de tipo User
   try {
     const response = await fetch("https://dummyjson.com/users/add", {
@@ -28,3 +30,5 @@ export const addUser = async (userDatos: User): Promise<User | undefined> => {  
     console.error("No se obtudo datos", error);
   }
 };
+
+

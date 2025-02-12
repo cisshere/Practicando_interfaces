@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import 'primeicons/primeicons.css';
 
 export const Contenedor = styled.div`
   display: grid;
