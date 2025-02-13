@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { Contenedor } from "./styled";
@@ -12,29 +12,10 @@ import { addUser } from "./../../servicios/users";
 import { Calendar } from "primereact/calendar";
 import { PrimeIcons } from "primereact/api";
 import "primeicons/primeicons.css";
-import { Toast } from "primereact/toast";
+import { Dialog } from "primereact/dialog";
 
 export function Home() {
-  const toast = useRef<Toast>(null);
-
-  const cuentaBancaria = (user: User) => {
-    if (user.bank) {
-      const { cardExpire, cardNumber, cardType, currency, iban } = user.bank;
-      toast.current?.show({
-        severity: "info",
-        summary: "Datos de la Cuenta Bancaria",
-        detail: `Card Expire: ${cardExpire}, Card Number: ${cardNumber},
-         Card Type: ${cardType}, Currency: ${currency}, IBAN: ${iban}`,
-      });
-    } else {
-      console.log("El usuario no tiene datos bancarios")
-    }
-  }; 
-
-  const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
-  const paginatorRight = <Button type="button" icon="pi pi-download" text />;
   const genero = ["Female", "Male"];
-
   const [customers, setCustomers] = useState<User[]>([]);
   const [valueAge, setValueAge] = useState(18);
   const [valueGender, setGender] = useState("");
@@ -43,9 +24,35 @@ export function Home() {
   const [valueMaidenName, setValueMaidenName] = useState("");
   const [valueEmail, setValueEmail] = useState("");
   const [valuePhone, setValuePhone] = useState("");
-  const [valueDate, setDate] = useState<Date | undefined>(undefined); // para qu
+  const [valueDate, setDate] = useState<Date | undefined>(undefined);
   const [valueUserName, setValueUserName] = useState("");
   const [valuePassword, setValuePassword] = useState("");
+
+  const [visible, setVisible] = useState<boolean>(false);
+  const [bankData, setBankData] = useState<User["bank"] | null>(null); // es de la propiedad bank de user, y puede traer null, sino me marca error
+
+  const cuentaBancaria = (user: User) => {
+    if (user.bank) {
+      setBankData(user.bank);
+      setVisible(true);
+    } else {
+      console.log("El usuario no tiene datos bancarios");
+    }
+  };
+
+  const footerContent = (
+    <div>
+      <Button
+        label="Ok"
+        icon="pi pi-check"
+        onClick={() => setVisible(false)}
+        autoFocus
+      />
+    </div>
+  );
+
+  const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
+  const paginatorRight = <Button type="button" icon="pi pi-download" text />;
 
   const handleSubmit = async () => {
     const userRegistrarion: User = {
@@ -192,14 +199,36 @@ export function Home() {
           field="actions"
           header="actions"
           style={{ width: "10%" }}
-          body={(user) => (
+          body={(userBank) => (
             <>
               <div className="card flex justify-content-center">
-                <Toast ref={toast} />
                 <Button
                   icon={PrimeIcons.BUILDING}
-                  onClick={() => cuentaBancaria(user)}
+                  onClick={() => cuentaBancaria(userBank)}
                 />
+                <Dialog
+                  header="Datos Bancarios"
+                  visible={visible}
+                  footer={footerContent}
+                  style={{ width: "50vw" }}
+                  onHide={() => setVisible(false)}
+                >
+                  {(() => {
+                    if (bankData) {
+                      return (
+                        <div>
+                          <p>Card Expire: {bankData.cardExpire}</p>
+                          <p>Card Number: {bankData.cardNumber}</p>
+                          <p>Card Type: {bankData.cardType}</p>
+                          <p>Currency: {bankData.currency}</p>
+                          <p>Iban: {bankData.iban}</p>
+                        </div>
+                      );
+                    } else {
+                      return <p>El usuario no tiene datos bancarios</p>;
+                    }
+                  })()}
+                </Dialog>
               </div>
             </>
           )}
