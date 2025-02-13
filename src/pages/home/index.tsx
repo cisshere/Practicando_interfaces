@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
-import { Contenedor } from "./styled";
+import { Contenedor, GrupoBotones } from "./styled";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
+import { ButtonGroup } from "primereact/buttongroup";
 import { Dropdown } from "primereact/dropdown";
 import { User } from "../../types";
 import { listUsers } from "./../../servicios/users";
@@ -87,25 +88,6 @@ export function Home() {
         <p>Datos de la persona</p>
       </div>
       <Contenedor>
-        <InputNumber
-          inputId="minmax-buttons"
-          value={valueAge}
-          onValueChange={(e) => setValueAge(e.value || 0)}
-          mode="decimal"
-          showButtons
-          min={0}
-          max={100}
-        />
-
-        <Dropdown
-          value={valueGender}
-          onChange={(e) => setGender(e.value)}
-          options={genero}
-          optionLabel="Genero"
-          placeholder="Genero"
-          className="w-full md:w-14rem"
-        />
-
         <div className="card flex justify-content-center">
           <InputText
             placeholder="FirstName"
@@ -128,6 +110,29 @@ export function Home() {
             variant="filled"
             value={valueMaidenName}
             onChange={(e) => setValueMaidenName(e.target.value)}
+          />
+        </div>
+        <div>
+          <InputNumber
+            inputId="minmax-buttons"
+            value={valueAge}
+            onValueChange={(e) => setValueAge(e.value || 0)}
+            mode="decimal"
+            showButtons
+            min={0}
+            max={100}
+            inputStyle={{ width: "100%" }}
+          />
+        </div>
+        <div>
+          <Dropdown
+            value={valueGender}
+            onChange={(e) => setGender(e.value)}
+            options={genero}
+            optionLabel="Genero"
+            placeholder="Genero"
+            className="w-full md:w-14rem"
+            style={{ width: "100%" }}
           />
         </div>
         <div className="card flex justify-content-center">
@@ -176,9 +181,13 @@ export function Home() {
           />
         </div>
       </Contenedor>
-      <div className="card flex justify-content-center">
-        <Button label="Guardar" onClick={handleSubmit} />
-      </div>
+      <GrupoBotones>
+        <ButtonGroup>
+          <Button label="Save" onClick={handleSubmit} icon="pi pi-check" />
+          <Button label="Delete" icon="pi pi-trash" />
+          <Button label="Cancel" icon="pi pi-times" />
+        </ButtonGroup>
+      </GrupoBotones>
       <DataTable
         value={customers}
         paginator
