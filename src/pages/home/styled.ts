@@ -10,8 +10,13 @@ export const Contenedor = styled.div`
   padding: 1rem 0;
 `;
 
-export const GrupoBotones = styled.div`
+export const GroupButtons = styled.div`
   display: flex;
   padding: 2rem 1rem;
   justify-content: flex-end;
+`;
+
+export const GroupActions= styled.div`
+  display: flex;
+  gap: 2px;
 `;

@@ -9,7 +9,7 @@ export interface User {
   phone: string;
   username?: string;
   password?: string;
-  birthDate?: Date | Date[];
+  birthDate?: Date;
   image?: string;
   bloodGroup?: string;
   heigth?: number;

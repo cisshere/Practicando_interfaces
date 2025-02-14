@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
-import { Contenedor, GrupoBotones } from "./styled";
+import { Contenedor, GroupButtons, GroupActions } from "./styled";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Button } from "primereact/button";
 import { ButtonGroup } from "primereact/buttongroup";
 import { Dropdown } from "primereact/dropdown";
 import { User } from "../../types";
-import { listUsers } from "./../../servicios/users";
+import { listUsers, userDeleteId } from "./../../servicios/users";
 import { addUser } from "./../../servicios/users";
 import { Calendar } from "primereact/calendar";
 import { PrimeIcons } from "primereact/api";
@@ -29,13 +29,15 @@ export function Home() {
   const [valueUserName, setValueUserName] = useState("");
   const [valuePassword, setValuePassword] = useState("");
 
-  const [visible, setVisible] = useState<boolean>(false);
+  const [visibleBank, setVisibleBank] = useState<boolean>(false);
   const [bankData, setBankData] = useState<User["bank"] | null>(null); // es de la propiedad bank de user, y puede traer null, sino me marca error
+  const [addressData, setAddressData] = useState<User["address"] | null>(null);
+  const [visibleAddress, setVisibleAddress] = useState<boolean>(false);
 
   const cuentaBancaria = (user: User) => {
     if (user.bank) {
       setBankData(user.bank);
-      setVisible(true);
+      setVisibleBank(true);
     } else {
       console.log("El usuario no tiene datos bancarios");
     }
@@ -46,11 +48,42 @@ export function Home() {
       <Button
         label="Ok"
         icon="pi pi-check"
-        onClick={() => setVisible(false)}
+        onClick={() => setVisibleBank(false)}
         autoFocus
       />
     </div>
   );
+
+  const dataAddress = (user: User) => {
+    if (user.bank) {
+      setAddressData(user.address);
+      setVisibleAddress(true);
+    } else {
+      console.log("El usuario no tiene datos bancarios");
+    }
+  };
+
+  const footerContent2 = (
+    <div>
+      <Button
+        label="Ok"
+        icon="pi pi-check"
+        onClick={() => setVisibleAddress(false)}
+        autoFocus
+      />
+    </div>
+  );
+
+  const deleteUserFromList = async (id: number) => {
+    try {
+      const deletedUser = await userDeleteId(id); //elimino el user
+      if (deletedUser) {
+        setCustomers(customers.filter((user) => user.id !== id)); // filtro la lista con el usuario ya eliminado
+      }
+    } catch (error) {
+      console.error("Error al eliminar el usuario", error);
+    }
+  };
 
   const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
   const paginatorRight = <Button type="button" icon="pi pi-download" text />;
@@ -157,6 +190,7 @@ export function Home() {
         <div className="card flex justify-content-center">
           <Calendar
             placeholder="birthDate"
+            variant="filled"
             value={valueDate}
             onChange={(e) => setDate(e.value || undefined)}
             dateFormat="dd/mm/yy"
@@ -165,7 +199,7 @@ export function Home() {
 
         <div className="card flex justify-content-center">
           <InputText
-            placeholder="Usenarme"
+            placeholder="userName"
             variant="filled"
             value={valueUserName}
             onChange={(e) => setValueUserName(e.target.value)}
@@ -181,13 +215,13 @@ export function Home() {
           />
         </div>
       </Contenedor>
-      <GrupoBotones>
+      <GroupButtons>
         <ButtonGroup>
           <Button label="Save" onClick={handleSubmit} icon="pi pi-check" />
           <Button label="Delete" icon="pi pi-trash" />
           <Button label="Cancel" icon="pi pi-times" />
         </ButtonGroup>
-      </GrupoBotones>
+      </GroupButtons>
       <DataTable
         value={customers}
         paginator
@@ -200,49 +234,80 @@ export function Home() {
         paginatorRight={paginatorRight}
       >
         <Column field="id" header="Id" style={{ width: "10%" }} />
-        <Column field="firstName" header="firstName" style={{ width: "20%" }} />
-        <Column field="lastName" header="lastName" style={{ width: "20%" }} />
-        <Column field="email" header="Email" style={{ width: "20%" }} />
+        <Column field="firstName" header="firstName" style={{ width: "15%" }} />
+        <Column field="lastName" header="lastName" style={{ width: "15%" }} />
+        <Column field="email" header="Email" style={{ width: "25%" }} />
         <Column field="phone" header="phone" style={{ width: "20%" }} />
         <Column
           field="actions"
           header="actions"
-          style={{ width: "10%" }}
-          body={(userBank) => (
+          style={{ width: "15%" }}
+          body={(user) => (
             <>
-              <div className="card flex justify-content-center">
+              <GroupActions>
+                <Button icon={PrimeIcons.USER_EDIT} />
+                <Button
+                  icon={PrimeIcons.TRASH}
+                  onClick={() => deleteUserFromList(user.id)}
+                />
+
+                <Button
+                  icon={PrimeIcons.BOOK}
+                  onClick={() => dataAddress(user)}
+                />
+
                 <Button
                   icon={PrimeIcons.BUILDING}
-                  onClick={() => cuentaBancaria(userBank)}
+                  onClick={() => cuentaBancaria(user)}
                 />
-                <Dialog
-                  header="Datos Bancarios"
-                  visible={visible}
-                  footer={footerContent}
-                  style={{ width: "50vw" }}
-                  onHide={() => setVisible(false)}
-                >
-                  {(() => {
-                    if (bankData) {
-                      return (
-                        <div>
-                          <p>Card Expire: {bankData.cardExpire}</p>
-                          <p>Card Number: {bankData.cardNumber}</p>
-                          <p>Card Type: {bankData.cardType}</p>
-                          <p>Currency: {bankData.currency}</p>
-                          <p>Iban: {bankData.iban}</p>
-                        </div>
-                      );
-                    } else {
-                      return <p>El usuario no tiene datos bancarios</p>;
-                    }
-                  })()}
-                </Dialog>
-              </div>
+              </GroupActions>
             </>
           )}
         />
       </DataTable>
+      <Dialog
+        header="Datos Bancarios"
+        visible={visibleAddress}
+        footer={footerContent2}
+        style={{ width: "50vw" }}
+        onHide={() => setVisibleAddress(false)}
+      >
+        {addressData ? (
+          <div>
+            <p>Address: {addressData.address}</p>
+            <p>City: {addressData.city}</p>
+            <p>
+              Coordinates: {addressData.coordinates.ing}
+              {addressData.coordinates.lat}
+            </p>
+            <p>Country: {addressData.country}</p>
+            <p>Postal Code: {addressData.postalCode} </p>
+            <p>State: {addressData.state} </p>
+            <p>State code: {addressData.stateCode} </p>
+          </div>
+        ) : (
+          <p>El usuario no tiene datos bancarios</p>
+        )}
+      </Dialog>
+      <Dialog
+        header="Datos Bancarios"
+        visible={visibleBank}
+        footer={footerContent}
+        style={{ width: "50vw" }}
+        onHide={() => setVisibleBank(false)}
+      >
+        {bankData ? (
+          <div>
+            <p>Card Expire: {bankData.cardExpire}</p>
+            <p>Card Number: {bankData.cardNumber}</p>
+            <p>Card Type: {bankData.cardType}</p>
+            <p>Currency: {bankData.currency}</p>
+            <p>Iban: {bankData.iban}</p>
+          </div>
+        ) : (
+          <p>El usuario no tiene datos bancarios</p>
+        )}
+      </Dialog>
     </>
   );
 }
