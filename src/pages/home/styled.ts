@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import "primeicons/primeicons.css";
 
 export const Contenedor = styled.div`
   display: grid;
@@ -6,4 +7,16 @@ export const Contenedor = styled.div`
   gap: 1rem;
   box-sizing: border-box;
   margin: 0 auto;
+  padding: 1rem 0;
+`;
+
+export const GroupButtons = styled.div`
+  display: flex;
+  padding: 2rem 1rem;
+  justify-content: flex-end;
+`;
+
+export const GroupActions= styled.div`
+  display: flex;
+  gap: 2px;
 `;
