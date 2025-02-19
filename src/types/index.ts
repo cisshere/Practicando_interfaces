@@ -4,12 +4,12 @@ export interface User {
   lastName: string;
   maidenName?: string;
   age?: number;
-  gender?: string;
+  gender: string;
   email: string;
   phone: string;
   username?: string;
   password?: string;
-  birthDate?: Date;
+  birthDate?: Date | null;
   image?: string;
   bloodGroup?: string;
   heigth?: number;

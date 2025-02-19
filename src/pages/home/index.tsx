@@ -16,7 +16,9 @@ import "primeicons/primeicons.css";
 import { Dialog } from "primereact/dialog";
 
 export function Home() {
-  const genero = ["Female", "Male"];
+  const [valueUserId, setValueUserId] = useState<number | null>(null);
+
+  const gender = ["female", "male"];
   const [customers, setCustomers] = useState<User[]>([]);
   const [valueAge, setValueAge] = useState(18);
   const [valueGender, setGender] = useState("");
@@ -25,7 +27,7 @@ export function Home() {
   const [valueMaidenName, setValueMaidenName] = useState("");
   const [valueEmail, setValueEmail] = useState("");
   const [valuePhone, setValuePhone] = useState("");
-  const [valueDate, setDate] = useState<Date | undefined>(undefined);
+  const [valueDate, setDate] = useState<Date | null>(null);
   const [valueUserName, setValueUserName] = useState("");
   const [valuePassword, setValuePassword] = useState("");
 
@@ -74,6 +76,20 @@ export function Home() {
     </div>
   );
 
+  const editUser = (user: User) => {
+    setValueUserId(user.id ?? null); //este no muestro, lo agarro
+    setValueFirstName(user.firstName);
+    setValueLastName(user.lastName);
+    setValueMaidenName(user.maidenName || "");
+    setValueAge(user.age || 18);
+    setGender(user.gender);
+    setValueEmail(user.email);
+    setValuePhone(user.phone || "");
+    setDate(user.birthDate ? new Date(user.birthDate) : null); // si user.birthDate tiene valor, new Date lo convierte en tipo Date, y si esta vacio queda tipo null
+    setValueUserName(user.username || "");
+    setValuePassword(user.password || "");
+  };
+
   const deleteUserFromList = async (id: number) => {
     try {
       const deletedUser = await userDeleteId(id); //elimino el user
@@ -88,16 +104,39 @@ export function Home() {
   const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
   const paginatorRight = <Button type="button" icon="pi pi-download" text />;
 
+  const handleCancel = () => {
+    setValueFirstName("");
+    setValueLastName("");
+    setValueMaidenName("");
+    setValueAge(18);
+    setGender("");
+    setValueEmail("");
+    setValuePhone("");
+    setDate(null);
+    setValueUserName("");
+    setValuePassword("");
+  };
+
+  const handleDelete = () => {
+    if (valueUserId !== null) { // si el valor del id no es null
+      deleteUserFromList(valueUserId); // borro el usuario mediante el id y filtro lista
+      setValueUserId(null); // lo reseto en null
+      handleCancel(); // y vacio los inputs
+    } else {
+      console.log("No hay tal usuario para borrar");
+    }
+  };
+
   const handleSubmit = async () => {
     const userRegistrarion: User = {
-      age: valueAge,
-      gender: valueGender,
       firstName: valueFirstName,
       lastName: valueLastName,
       maidenName: valueMaidenName,
+      age: valueAge,
+      gender: valueGender,
       email: valueEmail,
       phone: valuePhone || "",
-      birthDate: valueDate,
+      birthDate: valueDate ?? undefined,
       username: valueUserName,
       password: valuePassword,
     };
@@ -161,9 +200,9 @@ export function Home() {
           <Dropdown
             value={valueGender}
             onChange={(e) => setGender(e.value)}
-            options={genero}
-            optionLabel="Genero"
-            placeholder="Genero"
+            options={gender}
+            optionLabel="gender"
+            placeholder="gender"
             className="w-full md:w-14rem"
             style={{ width: "100%" }}
           />
@@ -192,7 +231,7 @@ export function Home() {
             placeholder="birthDate"
             variant="filled"
             value={valueDate}
-            onChange={(e) => setDate(e.value || undefined)}
+            onChange={(e) => setDate(e.value as Date | null)} //asi no me marca error
             dateFormat="dd/mm/yy"
           />
         </div>
@@ -218,8 +257,8 @@ export function Home() {
       <GroupButtons>
         <ButtonGroup>
           <Button label="Save" onClick={handleSubmit} icon="pi pi-check" />
-          <Button label="Delete" icon="pi pi-trash" />
-          <Button label="Cancel" icon="pi pi-times" />
+          <Button label="Delete" icon="pi pi-trash" onClick={handleDelete} />
+          <Button label="Cancel" icon="pi pi-times" onClick={handleCancel} />
         </ButtonGroup>
       </GroupButtons>
       <DataTable
@@ -245,7 +284,10 @@ export function Home() {
           body={(user) => (
             <>
               <GroupActions>
-                <Button icon={PrimeIcons.USER_EDIT} />
+                <Button
+                  icon={PrimeIcons.USER_EDIT}
+                  onClick={() => editUser(user)}
+                />
                 <Button
                   icon={PrimeIcons.TRASH}
                   onClick={() => deleteUserFromList(user.id)}
