@@ -14,28 +14,15 @@ import { Calendar } from "primereact/calendar";
 import { PrimeIcons } from "primereact/api";
 import "primeicons/primeicons.css";
 import { Dialog } from "primereact/dialog";
+import { useUserContext } from "../../types/context";
 
 export function Home() {
-
-  const [users, setUsers] = useState<User>({
-    id: undefined,
-    firstName: "",
-    lastName: "",
-    maidenName: "",
-    age: 18,
-    gender: "",
-    email: "",
-    phone: "",
-    birthDate: null,
-    username: "",
-    password: "",
-    // bank: undefined, 
-  });
+  const {user: users, setUsuario, customers, setCustomers} = useUserContext();
 
   //const [valueUserId, setValueUserId] = useState<number | null>(null);
 
   const gender = ["female", "male"];
-  const [customers, setCustomers] = useState<User[]>([]);
+  
 
   /*const [valueAge, setValueAge] = useState(18);
   const [valueGender, setGender] = useState("");
@@ -52,6 +39,7 @@ export function Home() {
   const [bankData, setBankData] = useState<User["bank"] | null>(null); // es de la propiedad bank de user, y puede traer null, sino me marca error
   const [addressData, setAddressData] = useState<User["address"] | null>(null);
   const [visibleAddress, setVisibleAddress] = useState<boolean>(false);
+
 
   const cuentaBancaria = (user: User) => {
     if (user.bank) {
@@ -94,7 +82,7 @@ export function Home() {
   );
 
   const editUser = (user: User) => {
-    setUsers({
+    setUsuario({
       ...users,
       id: user.id,
       firstName: user.firstName,
@@ -125,7 +113,7 @@ export function Home() {
   const paginatorRight = <Button type="button" icon="pi pi-download" text />;
 
   const handleCancel = () => {
-    setUsers({
+    setUsuario({
       id: undefined,
       firstName: "",
       lastName: "",
@@ -144,7 +132,7 @@ export function Home() {
     if (users.id !== undefined && users.id !== null) {
       // si el valor del id no es null o undefined
       deleteUserFromList(users.id); // borro el usuario mediante el id y filtro lista
-      setUsers({
+      setUsuario({
         // vaciar todos
         id: undefined,
         firstName: "",
@@ -165,7 +153,7 @@ export function Home() {
   };
 
   const handleSubmit = async () => {
-    const userRegistrarion: User = {
+    const userRegistrarion: Partial<User> = {
       firstName: users.firstName,
       lastName: users.lastName,
       maidenName: users.maidenName,
@@ -189,7 +177,7 @@ export function Home() {
 
   useEffect(() => {
     listUsers().then((users) => setCustomers(users || []));
-    //listUsers().then((users) => setUsers(users || []));
+    //listUsers().then((users) => setUsuario(users || []));
   }, []);
 
   return (
@@ -204,7 +192,7 @@ export function Home() {
             variant="filled"
             value={users?.firstName || ""}
             onChange={(e) =>
-              setUsers({ ...users, firstName: e.target.value })
+              setUsuario({ ...users, firstName: e.target.value })
             } /*setValueFirstName(e.target.value)*/
           />
         </div>
@@ -213,7 +201,7 @@ export function Home() {
             placeholder="LastName"
             variant="filled"
             value={users?.lastName || ""}
-            onChange={(e) => setUsers({ ...users, lastName: e.target.value })}
+            onChange={(e) => setUsuario({ ...users, lastName: e.target.value })}
           />
         </div>
         <div className="card flex justify-content-center">
@@ -221,7 +209,7 @@ export function Home() {
             placeholder="maidenName"
             variant="filled"
             value={users?.maidenName || ""}
-            onChange={(e) => setUsers({ ...users, maidenName: e.target.value })}
+            onChange={(e) => setUsuario({ ...users, maidenName: e.target.value })}
           />
         </div>
         <div>
@@ -229,7 +217,7 @@ export function Home() {
             inputId="minmax-buttons"
             value={users.age ?? 18}
             onValueChange={(e) =>
-              setUsers({ ...users, age: e.target.value ?? 18 })
+              setUsuario({ ...users, age: e.target.value ?? 18 })
             }
             mode="decimal"
             showButtons
@@ -241,7 +229,7 @@ export function Home() {
         <div>
           <Dropdown
             value={users.gender}
-            onChange={(e) => setUsers({ ...users, gender: e.target.value })}
+            onChange={(e) => setUsuario({ ...users, gender: e.target.value })}
             options={gender}
             optionLabel="gender"
             placeholder="gender"
@@ -254,7 +242,7 @@ export function Home() {
             placeholder="email"
             variant="filled"
             value={users.email}
-            onChange={(e) => setUsers({ ...users, email: e.target.value })}
+            onChange={(e) => setUsuario({ ...users, email: e.target.value })}
           />
         </div>
 
@@ -264,7 +252,7 @@ export function Home() {
             placeholder="phone"
             variant="filled"
             value={users.phone}
-            onChange={(e) => setUsers({ ...users, phone: e.target.value })}
+            onChange={(e) => setUsuario({ ...users, phone: e.target.value })}
           />
         </div>
 
@@ -273,7 +261,7 @@ export function Home() {
             placeholder="birthDate"
             variant="filled"
             value={users.birthDate}
-            onChange={(e) => setUsers({ ...users, birthDate: e.target.value })} //setDate(e.value as Date | null)} //asi no me marca error
+            onChange={(e) => setUsuario({ ...users, birthDate: e.target.value })} //setDate(e.value as Date | null)} //asi no me marca error
             dateFormat="dd/mm/yy"
           />
         </div>
@@ -283,7 +271,7 @@ export function Home() {
             placeholder="userName"
             variant="filled"
             value={users.username}
-            onChange={(e) => setUsers({ ...users, username: e.target.value })}
+            onChange={(e) => setUsuario({ ...users, username: e.target.value })}
           />
         </div>
 
@@ -292,7 +280,7 @@ export function Home() {
             placeholder="password"
             variant="filled"
             value={users.password}
-            onChange={(e) => setUsers({ ...users, password: e.target.value })}
+            onChange={(e) => setUsuario({ ...users, password: e.target.value })}
           />
         </div>
       </Contenedor>
@@ -361,8 +349,8 @@ export function Home() {
             <p>Address: {addressData.address}</p>
             <p>City: {addressData.city}</p>
             <p>
-              Coordinates: {addressData.coordinates.lng}
-              {addressData.coordinates.lat}
+              Coordinates: longitud:{addressData.coordinates.lng},
+              latitud: {addressData.coordinates.lat}
             </p>
             <p>Country: {addressData.country}</p>
             <p>Postal Code: {addressData.postalCode} </p>
@@ -397,3 +385,12 @@ export function Home() {
 }
 
 export default Home;
+
+
+export function Page2() {
+  const {user, customers} = useUserContext();
+  console.log(user)
+  console.log(customers)
+  
+              return (<div></div>)
+            }
