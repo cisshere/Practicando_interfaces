@@ -14,25 +14,32 @@ import { Calendar } from "primereact/calendar";
 import { PrimeIcons } from "primereact/api";
 import "primeicons/primeicons.css";
 import { Dialog } from "primereact/dialog";
+import { useUserContext } from "../../types/context";
 
 export function Home() {
-  const genero = ["Female", "Male"];
-  const [customers, setCustomers] = useState<User[]>([]);
-  const [valueAge, setValueAge] = useState(18);
+  const {user: users, setUsuario, customers, setCustomers} = useUserContext();
+
+  //const [valueUserId, setValueUserId] = useState<number | null>(null);
+
+  const gender = ["female", "male"];
+  
+
+  /*const [valueAge, setValueAge] = useState(18);
   const [valueGender, setGender] = useState("");
   const [valueFirstName, setValueFirstName] = useState("");
   const [valueLastName, setValueLastName] = useState("");
   const [valueMaidenName, setValueMaidenName] = useState("");
   const [valueEmail, setValueEmail] = useState("");
   const [valuePhone, setValuePhone] = useState("");
-  const [valueDate, setDate] = useState<Date | undefined>(undefined);
+  const [valueDate, setDate] = useState<Date | null>(null);
   const [valueUserName, setValueUserName] = useState("");
-  const [valuePassword, setValuePassword] = useState("");
+  const [valuePassword, setValuePassword] = useState(""); */
 
   const [visibleBank, setVisibleBank] = useState<boolean>(false);
   const [bankData, setBankData] = useState<User["bank"] | null>(null); // es de la propiedad bank de user, y puede traer null, sino me marca error
   const [addressData, setAddressData] = useState<User["address"] | null>(null);
   const [visibleAddress, setVisibleAddress] = useState<boolean>(false);
+
 
   const cuentaBancaria = (user: User) => {
     if (user.bank) {
@@ -55,7 +62,7 @@ export function Home() {
   );
 
   const dataAddress = (user: User) => {
-    if (user.bank) {
+    if (user.address) {
       setAddressData(user.address);
       setVisibleAddress(true);
     } else {
@@ -74,6 +81,23 @@ export function Home() {
     </div>
   );
 
+  const editUser = (user: User) => {
+    setUsuario({
+      ...users,
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      maidenName: user.maidenName,
+      age: user.age || 18,
+      gender: user.gender,
+      email: user.email,
+      phone: user.phone,
+      birthDate: user.birthDate ? new Date(user.birthDate) : null,
+      username: user.username,
+      password: user.password,
+    });
+  };
+
   const deleteUserFromList = async (id: number) => {
     try {
       const deletedUser = await userDeleteId(id); //elimino el user
@@ -88,18 +112,58 @@ export function Home() {
   const paginatorLeft = <Button type="button" icon="pi pi-refresh" text />;
   const paginatorRight = <Button type="button" icon="pi pi-download" text />;
 
+  const handleCancel = () => {
+    setUsuario({
+      id: undefined,
+      firstName: "",
+      lastName: "",
+      maidenName: "",
+      age: 18,
+      gender: "",
+      email: "",
+      phone: "",
+      birthDate: null,
+      username: "",
+      password: "",
+    });
+  };
+
+  const handleDelete = () => {
+    if (users.id !== undefined && users.id !== null) {
+      // si el valor del id no es null o undefined
+      deleteUserFromList(users.id); // borro el usuario mediante el id y filtro lista
+      setUsuario({
+        // vaciar todos
+        id: undefined,
+        firstName: "",
+        lastName: "",
+        maidenName: "",
+        age: 18,
+        gender: "",
+        email: "",
+        phone: "",
+        birthDate: null,
+        username: "",
+        password: "",
+      });
+      handleCancel(); // y vacio los inputs
+    } else {
+      console.log("No hay tal usuario para borrar");
+    }
+  };
+
   const handleSubmit = async () => {
-    const userRegistrarion: User = {
-      age: valueAge,
-      gender: valueGender,
-      firstName: valueFirstName,
-      lastName: valueLastName,
-      maidenName: valueMaidenName,
-      email: valueEmail,
-      phone: valuePhone || "",
-      birthDate: valueDate,
-      username: valueUserName,
-      password: valuePassword,
+    const userRegistrarion: Partial<User> = {
+      firstName: users.firstName,
+      lastName: users.lastName,
+      maidenName: users.maidenName,
+      age: users.age,
+      gender: users.gender,
+      email: users.email,
+      phone: users.phone,
+      birthDate: users.birthDate ?? undefined,
+      username: users.username,
+      password: users.password,
     };
 
     const newUser = await addUser(userRegistrarion); //esperando el nuevo usuario agregado a la lista
@@ -113,6 +177,7 @@ export function Home() {
 
   useEffect(() => {
     listUsers().then((users) => setCustomers(users || []));
+    //listUsers().then((users) => setUsuario(users || []));
   }, []);
 
   return (
@@ -125,31 +190,35 @@ export function Home() {
           <InputText
             placeholder="FirstName"
             variant="filled"
-            value={valueFirstName}
-            onChange={(e) => setValueFirstName(e.target.value)}
+            value={users?.firstName || ""}
+            onChange={(e) =>
+              setUsuario({ ...users, firstName: e.target.value })
+            } /*setValueFirstName(e.target.value)*/
           />
         </div>
         <div className="card flex justify-content-center">
           <InputText
             placeholder="LastName"
             variant="filled"
-            value={valueLastName}
-            onChange={(e) => setValueLastName(e.target.value)}
+            value={users?.lastName || ""}
+            onChange={(e) => setUsuario({ ...users, lastName: e.target.value })}
           />
         </div>
         <div className="card flex justify-content-center">
           <InputText
             placeholder="maidenName"
             variant="filled"
-            value={valueMaidenName}
-            onChange={(e) => setValueMaidenName(e.target.value)}
+            value={users?.maidenName || ""}
+            onChange={(e) => setUsuario({ ...users, maidenName: e.target.value })}
           />
         </div>
         <div>
           <InputNumber
             inputId="minmax-buttons"
-            value={valueAge}
-            onValueChange={(e) => setValueAge(e.value || 0)}
+            value={users.age ?? 18}
+            onValueChange={(e) =>
+              setUsuario({ ...users, age: e.target.value ?? 18 })
+            }
             mode="decimal"
             showButtons
             min={0}
@@ -159,11 +228,11 @@ export function Home() {
         </div>
         <div>
           <Dropdown
-            value={valueGender}
-            onChange={(e) => setGender(e.value)}
-            options={genero}
-            optionLabel="Genero"
-            placeholder="Genero"
+            value={users.gender}
+            onChange={(e) => setUsuario({ ...users, gender: e.target.value })}
+            options={gender}
+            optionLabel="gender"
+            placeholder="gender"
             className="w-full md:w-14rem"
             style={{ width: "100%" }}
           />
@@ -172,8 +241,8 @@ export function Home() {
           <InputText
             placeholder="email"
             variant="filled"
-            value={valueEmail}
-            onChange={(e) => setValueEmail(e.target.value)}
+            value={users.email}
+            onChange={(e) => setUsuario({ ...users, email: e.target.value })}
           />
         </div>
 
@@ -182,8 +251,8 @@ export function Home() {
           <InputText
             placeholder="phone"
             variant="filled"
-            value={valuePhone}
-            onChange={(e) => setValuePhone(e.target.value)}
+            value={users.phone}
+            onChange={(e) => setUsuario({ ...users, phone: e.target.value })}
           />
         </div>
 
@@ -191,8 +260,8 @@ export function Home() {
           <Calendar
             placeholder="birthDate"
             variant="filled"
-            value={valueDate}
-            onChange={(e) => setDate(e.value || undefined)}
+            value={users.birthDate}
+            onChange={(e) => setUsuario({ ...users, birthDate: e.target.value })} //setDate(e.value as Date | null)} //asi no me marca error
             dateFormat="dd/mm/yy"
           />
         </div>
@@ -201,8 +270,8 @@ export function Home() {
           <InputText
             placeholder="userName"
             variant="filled"
-            value={valueUserName}
-            onChange={(e) => setValueUserName(e.target.value)}
+            value={users.username}
+            onChange={(e) => setUsuario({ ...users, username: e.target.value })}
           />
         </div>
 
@@ -210,16 +279,16 @@ export function Home() {
           <InputText
             placeholder="password"
             variant="filled"
-            value={valuePassword}
-            onChange={(e) => setValuePassword(e.target.value)}
+            value={users.password}
+            onChange={(e) => setUsuario({ ...users, password: e.target.value })}
           />
         </div>
       </Contenedor>
       <GroupButtons>
         <ButtonGroup>
           <Button label="Save" onClick={handleSubmit} icon="pi pi-check" />
-          <Button label="Delete" icon="pi pi-trash" />
-          <Button label="Cancel" icon="pi pi-times" />
+          <Button label="Delete" icon="pi pi-trash" onClick={handleDelete} />
+          <Button label="Cancel" icon="pi pi-times" onClick={handleCancel} />
         </ButtonGroup>
       </GroupButtons>
       <DataTable
@@ -245,7 +314,10 @@ export function Home() {
           body={(user) => (
             <>
               <GroupActions>
-                <Button icon={PrimeIcons.USER_EDIT} />
+                <Button
+                  icon={PrimeIcons.USER_EDIT}
+                  onClick={() => editUser(user)}
+                />
                 <Button
                   icon={PrimeIcons.TRASH}
                   onClick={() => deleteUserFromList(user.id)}
@@ -266,7 +338,7 @@ export function Home() {
         />
       </DataTable>
       <Dialog
-        header="Datos Bancarios"
+        header="Dirección"
         visible={visibleAddress}
         footer={footerContent2}
         style={{ width: "50vw" }}
@@ -277,8 +349,8 @@ export function Home() {
             <p>Address: {addressData.address}</p>
             <p>City: {addressData.city}</p>
             <p>
-              Coordinates: {addressData.coordinates.ing}
-              {addressData.coordinates.lat}
+              Coordinates: longitud:{addressData.coordinates.lng},
+              latitud: {addressData.coordinates.lat}
             </p>
             <p>Country: {addressData.country}</p>
             <p>Postal Code: {addressData.postalCode} </p>
@@ -313,3 +385,12 @@ export function Home() {
 }
 
 export default Home;
+
+
+export function Page2() {
+  const {user, customers} = useUserContext();
+  console.log(user)
+  console.log(customers)
+  
+              return (<div></div>)
+            }

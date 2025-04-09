@@ -15,7 +15,7 @@ export const listUsers = async () => {
   }
 };
 
-export const addUser = async (userDatos: User): Promise<User | undefined> => {
+export const addUser = async (userDatos: Partial<User>): Promise<User | undefined> => {
   //Especificar que la promesa devuelve un usuario o undefined
   // y que userDatos es de tipo User
   try {

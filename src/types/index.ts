@@ -1,15 +1,21 @@
+
+//import React from "react";
+
+//export const userContext = React.createContext<User | null>(null);
+
+
 export interface User {
   id?: number;
   firstName: string;
   lastName: string;
-  maidenName?: string;
-  age?: number;
-  gender?: string;
+  maidenName: string;
+  age: number;
+  gender: string;
   email: string;
   phone: string;
-  username?: string;
+  username: string;
   password?: string;
-  birthDate?: Date;
+  birthDate?: Date | null;
   image?: string;
   bloodGroup?: string;
   heigth?: number;
@@ -46,7 +52,7 @@ export interface Address {
 
 export interface Coordinates {
   lat: number;
-  ing: number;
+  lng: number;
 }
 
 export interface Bank {
