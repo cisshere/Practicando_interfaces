@@ -16,11 +16,28 @@ import "primeicons/primeicons.css";
 import { Dialog } from "primereact/dialog";
 
 export function Home() {
-  const [valueUserId, setValueUserId] = useState<number | null>(null);
+
+  const [users, setUsers] = useState<User>({
+    id: undefined,
+    firstName: "",
+    lastName: "",
+    maidenName: "",
+    age: 18,
+    gender: "",
+    email: "",
+    phone: "",
+    birthDate: null,
+    username: "",
+    password: "",
+    // bank: undefined, 
+  });
+
+  //const [valueUserId, setValueUserId] = useState<number | null>(null);
 
   const gender = ["female", "male"];
   const [customers, setCustomers] = useState<User[]>([]);
-  const [valueAge, setValueAge] = useState(18);
+
+  /*const [valueAge, setValueAge] = useState(18);
   const [valueGender, setGender] = useState("");
   const [valueFirstName, setValueFirstName] = useState("");
   const [valueLastName, setValueLastName] = useState("");
@@ -29,7 +46,7 @@ export function Home() {
   const [valuePhone, setValuePhone] = useState("");
   const [valueDate, setDate] = useState<Date | null>(null);
   const [valueUserName, setValueUserName] = useState("");
-  const [valuePassword, setValuePassword] = useState("");
+  const [valuePassword, setValuePassword] = useState(""); */
 
   const [visibleBank, setVisibleBank] = useState<boolean>(false);
   const [bankData, setBankData] = useState<User["bank"] | null>(null); // es de la propiedad bank de user, y puede traer null, sino me marca error
@@ -57,7 +74,7 @@ export function Home() {
   );
 
   const dataAddress = (user: User) => {
-    if (user.bank) {
+    if (user.address) {
       setAddressData(user.address);
       setVisibleAddress(true);
     } else {
@@ -77,17 +94,20 @@ export function Home() {
   );
 
   const editUser = (user: User) => {
-    setValueUserId(user.id ?? null); //este no muestro, lo agarro
-    setValueFirstName(user.firstName);
-    setValueLastName(user.lastName);
-    setValueMaidenName(user.maidenName || "");
-    setValueAge(user.age || 18);
-    setGender(user.gender);
-    setValueEmail(user.email);
-    setValuePhone(user.phone || "");
-    setDate(user.birthDate ? new Date(user.birthDate) : null); // si user.birthDate tiene valor, new Date lo convierte en tipo Date, y si esta vacio queda tipo null
-    setValueUserName(user.username || "");
-    setValuePassword(user.password || "");
+    setUsers({
+      ...users,
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      maidenName: user.maidenName,
+      age: user.age || 18,
+      gender: user.gender,
+      email: user.email,
+      phone: user.phone,
+      birthDate: user.birthDate ? new Date(user.birthDate) : null,
+      username: user.username,
+      password: user.password,
+    });
   };
 
   const deleteUserFromList = async (id: number) => {
@@ -105,22 +125,39 @@ export function Home() {
   const paginatorRight = <Button type="button" icon="pi pi-download" text />;
 
   const handleCancel = () => {
-    setValueFirstName("");
-    setValueLastName("");
-    setValueMaidenName("");
-    setValueAge(18);
-    setGender("");
-    setValueEmail("");
-    setValuePhone("");
-    setDate(null);
-    setValueUserName("");
-    setValuePassword("");
+    setUsers({
+      id: undefined,
+      firstName: "",
+      lastName: "",
+      maidenName: "",
+      age: 18,
+      gender: "",
+      email: "",
+      phone: "",
+      birthDate: null,
+      username: "",
+      password: "",
+    });
   };
 
   const handleDelete = () => {
-    if (valueUserId !== null) { // si el valor del id no es null
-      deleteUserFromList(valueUserId); // borro el usuario mediante el id y filtro lista
-      setValueUserId(null); // lo reseto en null
+    if (users.id !== undefined && users.id !== null) {
+      // si el valor del id no es null o undefined
+      deleteUserFromList(users.id); // borro el usuario mediante el id y filtro lista
+      setUsers({
+        // vaciar todos
+        id: undefined,
+        firstName: "",
+        lastName: "",
+        maidenName: "",
+        age: 18,
+        gender: "",
+        email: "",
+        phone: "",
+        birthDate: null,
+        username: "",
+        password: "",
+      });
       handleCancel(); // y vacio los inputs
     } else {
       console.log("No hay tal usuario para borrar");
@@ -129,16 +166,16 @@ export function Home() {
 
   const handleSubmit = async () => {
     const userRegistrarion: User = {
-      firstName: valueFirstName,
-      lastName: valueLastName,
-      maidenName: valueMaidenName,
-      age: valueAge,
-      gender: valueGender,
-      email: valueEmail,
-      phone: valuePhone || "",
-      birthDate: valueDate ?? undefined,
-      username: valueUserName,
-      password: valuePassword,
+      firstName: users.firstName,
+      lastName: users.lastName,
+      maidenName: users.maidenName,
+      age: users.age,
+      gender: users.gender,
+      email: users.email,
+      phone: users.phone,
+      birthDate: users.birthDate ?? undefined,
+      username: users.username,
+      password: users.password,
     };
 
     const newUser = await addUser(userRegistrarion); //esperando el nuevo usuario agregado a la lista
@@ -152,6 +189,7 @@ export function Home() {
 
   useEffect(() => {
     listUsers().then((users) => setCustomers(users || []));
+    //listUsers().then((users) => setUsers(users || []));
   }, []);
 
   return (
@@ -164,31 +202,35 @@ export function Home() {
           <InputText
             placeholder="FirstName"
             variant="filled"
-            value={valueFirstName}
-            onChange={(e) => setValueFirstName(e.target.value)}
+            value={users?.firstName || ""}
+            onChange={(e) =>
+              setUsers({ ...users, firstName: e.target.value })
+            } /*setValueFirstName(e.target.value)*/
           />
         </div>
         <div className="card flex justify-content-center">
           <InputText
             placeholder="LastName"
             variant="filled"
-            value={valueLastName}
-            onChange={(e) => setValueLastName(e.target.value)}
+            value={users?.lastName || ""}
+            onChange={(e) => setUsers({ ...users, lastName: e.target.value })}
           />
         </div>
         <div className="card flex justify-content-center">
           <InputText
             placeholder="maidenName"
             variant="filled"
-            value={valueMaidenName}
-            onChange={(e) => setValueMaidenName(e.target.value)}
+            value={users?.maidenName || ""}
+            onChange={(e) => setUsers({ ...users, maidenName: e.target.value })}
           />
         </div>
         <div>
           <InputNumber
             inputId="minmax-buttons"
-            value={valueAge}
-            onValueChange={(e) => setValueAge(e.value || 0)}
+            value={users.age ?? 18}
+            onValueChange={(e) =>
+              setUsers({ ...users, age: e.target.value ?? 18 })
+            }
             mode="decimal"
             showButtons
             min={0}
@@ -198,8 +240,8 @@ export function Home() {
         </div>
         <div>
           <Dropdown
-            value={valueGender}
-            onChange={(e) => setGender(e.value)}
+            value={users.gender}
+            onChange={(e) => setUsers({ ...users, gender: e.target.value })}
             options={gender}
             optionLabel="gender"
             placeholder="gender"
@@ -211,8 +253,8 @@ export function Home() {
           <InputText
             placeholder="email"
             variant="filled"
-            value={valueEmail}
-            onChange={(e) => setValueEmail(e.target.value)}
+            value={users.email}
+            onChange={(e) => setUsers({ ...users, email: e.target.value })}
           />
         </div>
 
@@ -221,8 +263,8 @@ export function Home() {
           <InputText
             placeholder="phone"
             variant="filled"
-            value={valuePhone}
-            onChange={(e) => setValuePhone(e.target.value)}
+            value={users.phone}
+            onChange={(e) => setUsers({ ...users, phone: e.target.value })}
           />
         </div>
 
@@ -230,8 +272,8 @@ export function Home() {
           <Calendar
             placeholder="birthDate"
             variant="filled"
-            value={valueDate}
-            onChange={(e) => setDate(e.value as Date | null)} //asi no me marca error
+            value={users.birthDate}
+            onChange={(e) => setUsers({ ...users, birthDate: e.target.value })} //setDate(e.value as Date | null)} //asi no me marca error
             dateFormat="dd/mm/yy"
           />
         </div>
@@ -240,8 +282,8 @@ export function Home() {
           <InputText
             placeholder="userName"
             variant="filled"
-            value={valueUserName}
-            onChange={(e) => setValueUserName(e.target.value)}
+            value={users.username}
+            onChange={(e) => setUsers({ ...users, username: e.target.value })}
           />
         </div>
 
@@ -249,8 +291,8 @@ export function Home() {
           <InputText
             placeholder="password"
             variant="filled"
-            value={valuePassword}
-            onChange={(e) => setValuePassword(e.target.value)}
+            value={users.password}
+            onChange={(e) => setUsers({ ...users, password: e.target.value })}
           />
         </div>
       </Contenedor>
@@ -308,7 +350,7 @@ export function Home() {
         />
       </DataTable>
       <Dialog
-        header="Datos Bancarios"
+        header="Dirección"
         visible={visibleAddress}
         footer={footerContent2}
         style={{ width: "50vw" }}
@@ -319,7 +361,7 @@ export function Home() {
             <p>Address: {addressData.address}</p>
             <p>City: {addressData.city}</p>
             <p>
-              Coordinates: {addressData.coordinates.ing}
+              Coordinates: {addressData.coordinates.lng}
               {addressData.coordinates.lat}
             </p>
             <p>Country: {addressData.country}</p>
